@@ -3,18 +3,50 @@
 Implementación en Python de conversiones entre expresiones regulares y autómatas
 finitos, para el curso CC2019 de la Universidad del Valle de Guatemala.
 
-## Estado actual: parte 5
+## Estado actual: código completo
 
 El proyecto convierte expresiones regulares de infix a postfix con Shunting Yard,
 construye su AFN con Thompson, lo convierte a AFD mediante subconjuntos y minimiza
 el AFD con Hopcroft. Es posible simular la misma cadena sobre los tres autómatas.
 La minimización conserva el lenguaje, elimina estados inaccesibles y completa
-las tablas parciales cuando hace falta.
+las tablas parciales cuando hace falta. También exporta y dibuja los autómatas
+en DOT, SVG y PNG. Incluye menú interactivo, procesamiento de archivos y la
+construcción directa de AFD mediante followpos como recuperación.
+
+## Ejecutar el programa
+
+Desde la raíz del repositorio, abre el menú con:
+
+```powershell
+python main.py
+```
+
+También puedes ejecutar el flujo completo por argumentos:
+
+```powershell
+python main.py --regex '(a|b)*abb' --cadena abb --cadena aba --directo --dibujar --formato svg png
+```
+
+Procesar un archivo, con una expresión por línea:
+
+```powershell
+python main.py --archivo ejemplos/expresiones.txt --cadena abb --cadena= --directo --dibujar
+```
+
+`--cadena=` representa explícitamente la cadena vacía y funciona en PowerShell.
+Si omites `--cadena`, también se prueba la cadena vacía. Los dibujos se guardan
+en `salidas/individual/` o en una subcarpeta por línea del archivo. Puedes elegir
+otra carpeta con `--salida`.
+
+Usa `python main.py --help` para consultar las opciones. La [guía de uso](docs/uso.md)
+explica las operaciones, los archivos, los errores y los formatos de salida.
 
 ## Requisitos
 
 - Python 3.10 o posterior.
-- Esta parte utiliza únicamente la biblioteca estándar de Python.
+- El código Python utiliza únicamente la biblioteca estándar.
+- Para generar SVG y PNG se requiere Graphviz. La exportación DOT y los
+  algoritmos funcionan sin él. Consulta [instalación y dibujos](docs/visualizacion.md).
 
 Desde la raíz del repositorio, ejecuta las pruebas con:
 
@@ -121,6 +153,27 @@ mismo alfabeto; si recibe una tabla parcial, puede necesitar un estado adicional
 para representar el rechazo permanente. Consulta la
 [explicación de Hopcroft](docs/hopcroft.md).
 
+## Dibujar los tres autómatas
+
+Desde la raíz del repositorio:
+
+```powershell
+python -m ejemplos.dibujar
+```
+
+Genera `afn`, `afd` y `afd_minimo` en los formatos DOT, SVG y PNG dentro de
+`salidas/ejemplo/`. Abre los SVG en tu navegador o los PNG en un visor de imágenes.
+
+Para dibujar cualquier AFN o AFD creado con los modelos del proyecto:
+
+```python
+from automatas import dibujar_automata, regex_a_afn
+
+afn = regex_a_afn("a|ε")
+dibujar_automata(afn, "salidas/afn.svg", "AFN para a o epsilon")
+dibujar_automata(afn, "salidas/afn.dot")  # No necesita Graphviz.
+```
+
 ## Estructura actual
 
 ```text
@@ -132,6 +185,14 @@ automatas/
     subconjuntos.py   # Conversión de AFN a AFD
     hopcroft.py       # Preparación y minimización del AFD
     simulacion.py     # Cierre epsilon, movimientos y simulación de AFN y AFD
+    visualizacion.py  # Exportación DOT y dibujos con Graphviz
+    directo.py        # AFD directo mediante posiciones y followpos
+    analisis.py       # Coordinación de operaciones y simulación
+    archivos.py       # Archivos UTF-8 y errores por línea
+ejemplos/
+    dibujar.py        # Genera los tres autómatas de ejemplo
+    expresiones.txt   # Entrada válida para el procesamiento por archivo
+    expresiones_con_errores.txt # Muestra recuperación después de errores
 docs/
     arquitectura.md  # Objetos y comunicación entre módulos
     convenciones.md  # Símbolos y sintaxis aceptada
@@ -140,6 +201,9 @@ docs/
     thompson.md       # Reglas de construcción y ejemplo de simulación
     subconjuntos.md   # Conversión a AFD con tabla de estados
     hopcroft.md       # Particiones, minimización y verificación
+    visualizacion.md # Instalación, formatos y convenciones de dibujo
+    directo.md       # Construcción directa con followpos
+    uso.md           # Menú y opciones de consola
 tests/
     test_modelos.py   # Pruebas de las estructuras de datos
     test_regex.py     # Pruebas de conversión y errores de sintaxis
@@ -147,6 +211,10 @@ tests/
     test_subconjuntos.py # Conversión y equivalencia entre AFN y AFD
     test_hopcroft.py  # Equivalencia y minimalidad del AFD resultante
     test_simulacion.py # Recorridos sobre autómatas definidos a mano
+    test_visualizacion.py # Exportación y renderizado real de imágenes
+    test_directo.py   # Equivalencia de la construcción directa
+    test_integracion.py # Archivos y programa completo
+main.py              # Punto de entrada del programa
 ```
 
 La cadena vacía se representa con `ε` en las expresiones regulares y las
@@ -158,8 +226,9 @@ Consulta el [plan de commits](docs/plan.md), la
 
 ## Entrega final
 
-Queda pendiente implementar los dibujos y la interfaz con lectura de archivos,
-además de completar la documentación y agregar el enlace al video explicativo
-no listado de YouTube, de un máximo de
-10 minutos. El enunciado solicita entregar el proyecto en un repositorio privado
-de GitHub o Bitbucket.
+El código y la documentación técnica están implementados. Para la entrega
+académica todavía debes grabar el video explicativo no listado de YouTube,
+de un máximo de 10 minutos, agregar su enlace a este README y verificar que el
+repositorio de GitHub o Bitbucket sea privado.
+
+**Enlace al video:** pendiente de grabación y publicación por el estudiante.

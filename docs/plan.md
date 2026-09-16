@@ -23,16 +23,16 @@ La documentación se actualizará junto con el código de cada parte.
 - [x] Construir un AFD mediante subconjuntos.
 - [x] Minimizar un AFD con Hopcroft.
 - [x] Simular la cadena sobre cada AFN y AFD producido e informar aceptación
-  (funciones disponibles; integración en consola en la parte 7).
-- [ ] Dibujar un AFN o AFD dado.
-- [ ] Procesar un archivo UTF-8 con una expresión regular por línea y producir
+  (funciones e interfaz de consola implementadas).
+- [x] Dibujar un AFN o AFD dado.
+- [x] Procesar un archivo UTF-8 con una expresión regular por línea y producir
   los resultados requeridos para cada expresión.
 - [x] Definir explícitamente el símbolo epsilon: `ε`.
 - [x] Definir los objetos que representan AFN y AFD.
-- [ ] Completar la documentación de arquitectura y comunicación entre módulos.
+- [x] Completar la documentación de arquitectura y comunicación entre módulos.
 - [ ] Incluir un enlace a un video no listado de YouTube de hasta 10 minutos.
 - [ ] Verificar que el repositorio usado para entregar sea privado.
-- [ ] Opcional: construcción directa de AFD para recuperación.
+- [x] Opcional: construcción directa de AFD para recuperación.
 
 La rúbrica asigna 15 puntos a los requisitos base y 3 puntos adicionales a la
 construcción directa. El dibujo y la lectura de archivos también son requisitos,
@@ -119,3 +119,34 @@ git commit -m "feat: minimizar AFD con Hopcroft"
 
 El ejemplo debe imprimir `5 4`: el AFD pasa de cinco estados a cuatro sin cambiar
 su lenguaje. La siguiente parte agregará los dibujos de los autómatas.
+
+## Parte 6: cómo revisar y guardar
+
+```powershell
+python -m unittest discover -s tests -v
+python -m ejemplos.dibujar
+git status --short
+git add .gitignore automatas tests ejemplos README.md docs
+git diff --cached --stat
+git commit -m "feat: dibujar automatas finitos"
+```
+
+Los dibujos quedan en `salidas/ejemplo/`. Los binarios portátiles de Graphviz
+en `.tools/` no se incluyen en el commit.
+
+## Integración final del código
+
+Se implementaron también la consola, la lectura de archivos y la construcción
+directa. Para guardar todos los cambios restantes juntos:
+
+```powershell
+python -m unittest discover -s tests -v
+python main.py --regex '(a|b)*abb' --cadena abb --cadena aba --directo --dibujar
+python main.py --archivo ejemplos/expresiones.txt --cadena abb --cadena= --directo
+git add .gitignore main.py automatas tests ejemplos README.md docs
+git diff --cached --stat
+git commit -m "feat: completar visualizacion consola archivos y AFD directo"
+```
+
+La grabación del video, su enlace y la privacidad del repositorio son los pasos
+de entrega que debe realizar el estudiante.

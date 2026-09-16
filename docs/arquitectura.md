@@ -176,11 +176,56 @@ La función devuelve el mismo tipo `AFD` que subconjuntos, por lo que
 no forman parte de la API pública. La documentación de
 [Hopcroft](hopcroft.md) incluye una traza de la reducción de cinco a cuatro estados.
 
-## Módulos del proyecto y previstos
+## Visualización: parte 6
 
-Actualmente existen `modelos.py`, `regex.py`, `thompson.py`, `subconjuntos.py`,
-`hopcroft.py` y `simulacion.py` para ambos tipos de autómata. Los demás módulos
-forman parte del diseño de las siguientes entregas.
+`visualizacion.py` expone `automata_a_dot(automata, titulo=None) -> str` y
+`dibujar_automata(automata, ruta, titulo=None, *, ejecutable_dot=None) -> Path`.
+Ambas aceptan los modelos `AFN` y `AFD`, validan su contenido y no los modifican.
+
+La exportación crea identificadores internos seguros, declara todos los estados
+y agrupa las etiquetas de transiciones que tienen los mismos extremos. Las
+etiquetas conservan epsilon y hacen visibles los espacios y caracteres de control.
+Los títulos y símbolos se escapan antes de incorporarlos al código DOT.
+
+`dibujar_automata` decide el formato por la extensión `.dot`, `.svg` o `.png`.
+DOT se escribe directamente en UTF-8. SVG y PNG se generan enviando el DOT por
+la entrada estándar de Graphviz, sin intérprete de comandos. La salida se guarda
+una vez finaliza correctamente el proceso, con un límite de 30 segundos.
+
+El ejecutable se toma del parámetro explícito, de `PATH` o de la carpeta portátil
+`.tools/graphviz`. La ausencia de Graphviz produce `FileNotFoundError`; un fallo
+del renderizado produce `RuntimeError`; una extensión inválida produce `ValueError`.
+Los errores de permisos o escritura se propagan como `OSError`. El ejemplo
+`python -m ejemplos.dibujar` genera los tres autómatas en los tres formatos.
+
+## Construcción directa y coordinación del programa
+
+`directo.py` implementa `regex_a_afd_directo(expresion: str) -> AFD` usando
+anulabilidad, firstpos, lastpos y followpos. Los nodos internos se resumen con
+la clase `_Nodo`. La posición de aceptación no utiliza un carácter reservado.
+La función no construye un AFN. Consulta [construcción directa](directo.md).
+
+`analisis.py` ofrece `analizar_expresion(expresion, operacion="todo",
+incluir_directo=False) -> ResultadoAnalisis`. El resultado contiene la expresión,
+su postfix y un diccionario de los autómatas solicitados. Su método
+`simular(cadena)` devuelve un diccionario de aceptación para la misma cadena.
+Las claves posibles son `afn`, `afd`, `afd_minimo` y `afd_directo`.
+
+`archivos.py` ofrece `leer_expresiones(ruta)` y `analizar_archivo(ruta, ...)`.
+La lectura usa UTF-8 con soporte de BOM, conserva la numeración original y
+omite las líneas vacías. Cada `ResultadoLinea` contiene `numero`, `expresion`
+y un `resultado` o un `error`. Los errores de sintaxis de una línea no detienen
+el procesamiento de las demás; los errores de lectura se propagan al llamador.
+
+`main.py` combina estas interfaces. Permite seleccionar operaciones, simular
+varias cadenas, mostrar tablas y dibujar cada resultado. Sin argumentos ofrece
+un menú interactivo; con argumentos usa `argparse`. Los resultados se imprimen
+en la salida estándar y los errores en la salida de errores. La guía completa
+está en [uso](uso.md).
+
+## Módulos del proyecto
+
+Los módulos de la siguiente tabla están implementados.
 
 | Módulo | Responsabilidad | Entrada y salida previstas |
 | --- | --- | --- |
@@ -191,13 +236,14 @@ forman parte del diseño de las siguientes entregas.
 | `hopcroft.py` | Eliminar estados inaccesibles, completar y minimizar | `AFD` → `AFD` |
 | `simulacion.py` | Evaluar la pertenencia de una cadena | `AFN` o `AFD`, `str` → `bool` |
 | `visualizacion.py` | Dibujar estados y transiciones | `AFN` o `AFD`, ruta → archivo |
+| `directo.py` | Construir AFD directamente con posiciones | `str` infix → `AFD` |
+| `analisis.py` | Coordinar operaciones y comparar simulaciones | Expresión y opciones → `ResultadoAnalisis` |
 | `archivos.py` | Leer expresiones e informar errores por línea | Ruta UTF-8 → expresiones con número de línea |
 | `main.py` (en la raíz) | Coordinar las opciones del usuario | Argumentos de consola → resultados |
 
-La construcción directa de AFD se reservará para un módulo adicional si se
-realiza la parte de recuperación.
+La construcción directa corresponde a los puntos de recuperación del enunciado.
 
-## Flujo previsto
+## Flujo del programa
 
 1. La interfaz recibe una expresión regular y una cadena.
 2. Shunting Yard valida y transforma la expresión a postfix.
@@ -206,15 +252,16 @@ realiza la parte de recuperación.
 5. Hopcroft produce un nuevo AFD mínimo.
 6. La simulación evalúa la misma cadena sobre cada autómata producido.
 7. La visualización dibuja los autómatas solicitados.
+8. Si se solicita recuperación, se construye y simula también el AFD directo.
 
-Los módulos se comunicarán mediante llamadas a funciones y los objetos
+Los módulos se comunican mediante llamadas a funciones y los objetos
 anteriores, sin variables globales para guardar estados. Los errores de entrada
-se comunicarán mediante `ValueError`; la interfaz los presentará al usuario.
-Para un archivo, se procesará una expresión por línea y se identificará cada
+se comunican mediante `ValueError`; la interfaz los presenta al usuario.
+Para un archivo, se procesa una expresión por línea y se identifica cada
 resultado con su número de línea, continuando después de una expresión inválida.
 
-## Documentación pendiente
+## Entrega académica pendiente
 
-La arquitectura se actualizará conforme se implementen las funciones. La entrega
-final debe incluir ejemplos completos de uso y el enlace al video no listado de
-YouTube, con duración máxima de 10 minutos. El video todavía no se ha creado.
+La documentación incluye ejemplos completos de uso. El estudiante todavía debe
+grabar el video no listado de YouTube, de hasta 10 minutos, y agregar el enlace
+al README. El repositorio usado para entregar debe ser privado.

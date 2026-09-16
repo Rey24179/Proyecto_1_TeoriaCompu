@@ -10,6 +10,7 @@ htmlcov/
 # Archivos generados y temporales
 salidas/
 tmp/
+.tools/
 
 # Configuracion local del editor
 .vscode/
