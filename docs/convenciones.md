@@ -38,6 +38,10 @@ no son requisitos adicionales del enunciado.
 - Los operadores y `ε` son símbolos reservados y no pueden usarse como literales.
 - Los grupos vacíos `()` son inválidos; se debe escribir `(ε)` si se desea
   agrupar la cadena vacía.
+- La entrada postfix de Thompson usa los mismos literales y operadores, pero
+  no admite paréntesis y exige todos los puntos de concatenación. Por ejemplo,
+  `ab.` es válido y `ab` es inválido porque le falta el operador. Los espacios
+  en blanco también se ignoran en la entrada postfix.
 
 ## Autómatas y cadenas
 
@@ -48,6 +52,11 @@ no son requisitos adicionales del enunciado.
 - Una cadena vacía para simular se representa mediante `""`; no se pasa el
   carácter `ε` como si fuera parte de la cadena de entrada.
 - Una transición ausente equivale a no tener un movimiento válido.
+- La simulación de AFN mantiene un conjunto de estados posibles y aplica cierre
+  epsilon al inicio y después de cada símbolo. Solo acepta si, tras consumir
+  toda la cadena, ese conjunto contiene algún estado de aceptación.
+- Un símbolo de entrada fuera del alfabeto produce rechazo (`False`). Esto
+  incluye el carácter `ε`: para simular la cadena vacía se utiliza `""`.
 - Un AFD podrá almacenarse de forma parcial; antes de aplicar Hopcroft se
   completará, cuando haga falta, con un estado sumidero.
 - Los archivos de texto se leerán en UTF-8 para conservar `ε` correctamente.

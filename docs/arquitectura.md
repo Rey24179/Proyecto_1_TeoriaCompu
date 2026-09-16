@@ -81,22 +81,56 @@ sus espacios. El error de expresión vacía o de operando faltante al final se
 describe sin una posición concreta.
 
 El resultado es una cadena, sin espacios ni paréntesis: cada carácter representa
-un literal, `ε` o un operador. La parte 3 consumirá esta representación desde
-Thompson. La explicación y una traza están en [Shunting Yard](shunting_yard.md).
+un literal, `ε` o un operador. Thompson consume esta representación para construir
+el AFN. La explicación y una traza están en [Shunting Yard](shunting_yard.md).
+
+## Thompson y simulación de AFN: parte 3
+
+Las siguientes funciones también se exportan desde el paquete `automatas`:
+
+| Función | Entrada | Salida |
+| --- | --- | --- |
+| `postfix_a_afn(postfix: str) -> AFN` | Expresión postfix | Nuevo AFN con un único estado de aceptación |
+| `regex_a_afn(expresion: str) -> AFN` | Expresión infix | Nuevo AFN construido con Shunting Yard y Thompson |
+| `cierre_epsilon(afn, estados) -> set[int]` | AFN válido y conjunto de estados | Estados alcanzables usando cero o más transiciones epsilon |
+| `mover(afn, estados, simbolo) -> set[int]` | AFN válido, conjunto de estados y símbolo | Destinos al consumir el símbolo, sin cierre epsilon |
+| `simular_afn(afn: AFN, cadena: str) -> bool` | AFN y cadena completa | `True` si acepta, `False` si rechaza |
+
+`postfix_a_afn` guarda fragmentos en una pila. Cada `_Fragmento` contiene dos
+enteros: `inicio` y `fin`. Los estados, el alfabeto y las transiciones se acumulan
+en estructuras locales a la llamada, y el constructor de `AFN` valida el
+resultado final. Los errores de postfix producen `ValueError`.
+
+`regex_a_afn` llama a `infix_a_postfix` y entrega su resultado a `postfix_a_afn`.
+La llamada no altera otros autómatas ni utiliza contadores globales de estados.
+
+`cierre_epsilon` y `mover` aceptan `set[int]` o `frozenset[int]`, comprueban que
+los estados pertenezcan al AFN y devuelven conjuntos nuevos. Requieren un AFN
+válido; no repiten la validación completa en cada movimiento. Si se les pasan
+estados ajenos al AFN, lanzan `ValueError`. `mover` devuelve el conjunto vacío
+para símbolos fuera del alfabeto, incluido `ε`.
+
+`simular_afn` valida primero el AFN y luego combina estas operaciones. No elimina
+espacios de la cadena ni acepta solamente un prefijo: debe consumirse toda la
+entrada. Un símbolo fuera del alfabeto implica rechazo. La simulación conserva
+el autómata para futuras cadenas y conversiones.
+
+Las reglas de construcción y una traza se describen en [Thompson](thompson.md).
 
 ## Módulos del proyecto y previstos
 
-Actualmente existen `modelos.py` y `regex.py`. Los demás módulos de esta tabla
-forman parte del diseño de las siguientes entregas.
+Actualmente existen `modelos.py`, `regex.py`, `thompson.py` y la parte de AFN de
+`simulacion.py`. Los demás módulos y la simulación de AFD forman parte del diseño
+de las siguientes entregas.
 
 | Módulo | Responsabilidad | Entrada y salida previstas |
 | --- | --- | --- |
 | `modelos.py` | Definir y validar autómatas | Componentes → `AFN` o `AFD` |
 | `regex.py` | Validar sintaxis e implementar Shunting Yard | `str` infix → `str` postfix |
-| `thompson.py` | Construir un AFN con fragmentos | `str` postfix → `AFN` |
+| `thompson.py` | Construir un AFN con fragmentos | `str` postfix o infix → `AFN` |
 | `subconjuntos.py` | Aplicar cierre epsilon y conjuntos de estados | `AFN` → `AFD` |
 | `hopcroft.py` | Eliminar estados inaccesibles, completar y minimizar | `AFD` → `AFD` |
-| `simulacion.py` | Evaluar la pertenencia de una cadena | `AFN` o `AFD`, `str` → `bool` |
+| `simulacion.py` | Evaluar la pertenencia de una cadena | `AFN`, `str` → `bool`; AFD pendiente |
 | `visualizacion.py` | Dibujar estados y transiciones | `AFN` o `AFD`, ruta → archivo |
 | `archivos.py` | Leer expresiones e informar errores por línea | Ruta UTF-8 → expresiones con número de línea |
 | `main.py` (en la raíz) | Coordinar las opciones del usuario | Argumentos de consola → resultados |
