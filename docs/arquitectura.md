@@ -17,7 +17,7 @@ la definición formal de un autómata `(Q, Σ, δ, q0, F)`:
 En el AFN, una pareja `(estado, símbolo)` puede llevar a varios estados. En el
 AFD, esa pareja solo tiene un destino. En ambos casos, una clave ausente
 representa una transición no definida. La función de transición de un AFD
-parcial se completará para los algoritmos que necesiten un AFD total.
+parcial se completa al aplicar Hopcroft, que necesita un AFD total.
 
 Ejemplo de un AFN con una transición epsilon y dos destinos para `a`:
 
@@ -149,11 +149,38 @@ Una entrada inconsistente produce `ValueError` al validar; una cadena que no
 pertenece al lenguaje devuelve `False`. El ejemplo de la construcción está en
 [Subconjuntos](subconjuntos.md).
 
+## Minimización con Hopcroft: parte 5
+
+La función `minimizar_afd(afd: AFD) -> AFD`, exportada desde `automatas`, devuelve
+un AFD mínimo completo sobre el mismo alfabeto. No modifica el autómata recibido
+y lanza `ValueError` si su definición es inconsistente.
+
+El módulo `hopcroft.py` divide el trabajo en tres pasos:
+
+1. `_preparar_afd` copia los estados alcanzables desde el inicial y completa las
+   transiciones ausentes con un sumidero no final. Los inaccesibles se descartan.
+2. `_particiones_hopcroft` separa finales y no finales, y refina esos bloques
+   usando los predecesores de cada estado y la regla del bloque más pequeño.
+3. `minimizar_afd` construye el autómata cociente: cada bloque estable representa
+   un estado. Lo numera por recorrido en anchura desde `0`, con alfabeto ordenado.
+
+Las estructuras internas son una lista de conjuntos de estados (`bloques`), un
+diccionario de estado a bloque (`bloque_de`), un índice de predecesores por
+`(símbolo, destino)`, y una cola de bloques divisores pendientes. Un conjunto
+auxiliar permite saber qué bloques ya están en la cola. Solo se recorren los
+bloques afectados por cada corte, y al dividir un bloque se actualiza la
+pertenencia de los estados de la intersección.
+
+La función devuelve el mismo tipo `AFD` que subconjuntos, por lo que
+`simular_afd` evalúa tanto el AFD original como el mínimo. Los bloques internos
+no forman parte de la API pública. La documentación de
+[Hopcroft](hopcroft.md) incluye una traza de la reducción de cinco a cuatro estados.
+
 ## Módulos del proyecto y previstos
 
-Actualmente existen `modelos.py`, `regex.py`, `thompson.py`, `subconjuntos.py` y
-`simulacion.py` para ambos tipos de autómata. Los demás módulos forman parte del
-diseño de las siguientes entregas.
+Actualmente existen `modelos.py`, `regex.py`, `thompson.py`, `subconjuntos.py`,
+`hopcroft.py` y `simulacion.py` para ambos tipos de autómata. Los demás módulos
+forman parte del diseño de las siguientes entregas.
 
 | Módulo | Responsabilidad | Entrada y salida previstas |
 | --- | --- | --- |

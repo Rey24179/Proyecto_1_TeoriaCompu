@@ -91,7 +91,8 @@ Ese estado puede ser final o no, según el cierre inicial. Los ciclos epsilon no
 producen recorridos infinitos porque el cierre registra los estados visitados.
 
 La construcción no minimiza. Dos subconjuntos diferentes podrían aceptar las
-mismas continuaciones; la parte 5 usará Hopcroft para unir estados equivalentes.
+mismas continuaciones; la [parte 5](hopcroft.md) usa Hopcroft para unir estados
+equivalentes.
 
 ## Simulación del AFD
 

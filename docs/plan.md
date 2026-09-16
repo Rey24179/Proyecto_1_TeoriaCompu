@@ -21,7 +21,7 @@ La documentación se actualizará junto con el código de cada parte.
 - [x] Convertir de infix a postfix usando Shunting Yard.
 - [x] Construir un AFN mediante Thompson.
 - [x] Construir un AFD mediante subconjuntos.
-- [ ] Minimizar un AFD con Hopcroft.
+- [x] Minimizar un AFD con Hopcroft.
 - [x] Simular la cadena sobre cada AFN y AFD producido e informar aceptación
   (funciones disponibles; integración en consola en la parte 7).
 - [ ] Dibujar un AFN o AFD dado.
@@ -102,3 +102,20 @@ git commit -m "feat: convertir AFN a AFD mediante subconjuntos"
 ```
 
 El ejemplo debe imprimir `abb: True` y `aba: False` en líneas separadas.
+
+## Parte 5: cómo revisar y guardar
+
+Incluye eliminación de estados inaccesibles, completado de tablas parciales y
+minimización con Hopcroft. El resultado se simula con `simular_afd`.
+
+```powershell
+python -m unittest discover -s tests -v
+python -c "from automatas import regex_a_afn, afn_a_afd, minimizar_afd; afd = afn_a_afd(regex_a_afn('(a|b)*abb')); minimo = minimizar_afd(afd); print(len(afd.estados), len(minimo.estados))"
+git status --short
+git add automatas tests README.md docs
+git diff --cached --stat
+git commit -m "feat: minimizar AFD con Hopcroft"
+```
+
+El ejemplo debe imprimir `5 4`: el AFD pasa de cinco estados a cuatro sin cambiar
+su lenguaje. La siguiente parte agregará los dibujos de los autómatas.

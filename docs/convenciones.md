@@ -63,6 +63,12 @@ no son requisitos adicionales del enunciado.
 - El modelo AFD admite tablas parciales y su simulador rechaza si falta una
   transición. La conversión por subconjuntos genera un AFD completo: crea el
   sumidero que representa el conjunto vacío solo si es alcanzable.
-- Antes de aplicar Hopcroft a un AFD parcial se completará su tabla, cuando haga
-  falta, con un estado sumidero.
+- Hopcroft descarta los estados inaccesibles y completa la tabla parcial, cuando
+  hace falta, con un estado sumidero. Luego fusiona estados equivalentes.
+- La minimización devuelve un AFD completo mínimo para el alfabeto original.
+  El resultado puede tener más estados que una representación parcial porque
+  el rechazo implícito se representa mediante un estado. Si la entrada ya es
+  completa, la cantidad de estados no aumenta.
+- El AFD mínimo comienza en el estado `0` y se numera por recorrido en anchura
+  siguiendo los símbolos ordenados. Minimizarlo otra vez da el mismo resultado.
 - Los archivos de texto se leerán en UTF-8 para conservar `ε` correctamente.

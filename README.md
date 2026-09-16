@@ -3,13 +3,13 @@
 Implementación en Python de conversiones entre expresiones regulares y autómatas
 finitos, para el curso CC2019 de la Universidad del Valle de Guatemala.
 
-## Estado actual: parte 4
+## Estado actual: parte 5
 
 El proyecto convierte expresiones regulares de infix a postfix con Shunting Yard,
-construye su AFN con Thompson y lo convierte a AFD mediante subconjuntos. Es
-posible simular la misma cadena sobre ambos autómatas. El conversor valida la
-sintaxis y considera las transiciones epsilon. La minimización con Hopcroft
-se agregará en la siguiente parte.
+construye su AFN con Thompson, lo convierte a AFD mediante subconjuntos y minimiza
+el AFD con Hopcroft. Es posible simular la misma cadena sobre los tres autómatas.
+La minimización conserva el lenguaje, elimina estados inaccesibles y completa
+las tablas parciales cuando hace falta.
 
 ## Requisitos
 
@@ -93,8 +93,33 @@ Salida esperada:
 
 Cada estado del AFD representa un conjunto de estados del AFN. El AFD generado
 es completo sobre su alfabeto e incluye un estado sumidero cuando se necesita.
-El AFN original se conserva. La construcción no minimiza el AFD; ese será el
-siguiente paso. Consulta la [explicación de subconjuntos](docs/subconjuntos.md).
+El AFN original se conserva. La minimización se realiza en una llamada separada
+a Hopcroft. Consulta la [explicación de subconjuntos](docs/subconjuntos.md).
+
+## Minimizar con Hopcroft
+
+```python
+from automatas import afn_a_afd, minimizar_afd, regex_a_afn, simular_afd, simular_afn
+
+afn = regex_a_afn("(a|b)*abb")
+afd = afn_a_afd(afn)
+minimo = minimizar_afd(afd)
+
+print(len(afd.estados), len(minimo.estados))  # 5 4
+for cadena in ("abb", "aba", ""):
+    print(
+        repr(cadena),
+        simular_afn(afn, cadena),
+        simular_afd(afd, cadena),
+        simular_afd(minimo, cadena),
+    )
+```
+
+Los tres autómatas aceptan `abb` y rechazan `aba` y la cadena vacía. El AFD
+original se conserva. `minimizar_afd` devuelve un AFD mínimo completo sobre el
+mismo alfabeto; si recibe una tabla parcial, puede necesitar un estado adicional
+para representar el rechazo permanente. Consulta la
+[explicación de Hopcroft](docs/hopcroft.md).
 
 ## Estructura actual
 
@@ -105,6 +130,7 @@ automatas/
     regex.py          # Validación, concatenación y Shunting Yard
     thompson.py       # Construcción de AFN desde postfix o infix
     subconjuntos.py   # Conversión de AFN a AFD
+    hopcroft.py       # Preparación y minimización del AFD
     simulacion.py     # Cierre epsilon, movimientos y simulación de AFN y AFD
 docs/
     arquitectura.md  # Objetos y comunicación entre módulos
@@ -113,11 +139,13 @@ docs/
     shunting_yard.md  # Explicación del conversor con ejemplo paso a paso
     thompson.md       # Reglas de construcción y ejemplo de simulación
     subconjuntos.md   # Conversión a AFD con tabla de estados
+    hopcroft.md       # Particiones, minimización y verificación
 tests/
     test_modelos.py   # Pruebas de las estructuras de datos
     test_regex.py     # Pruebas de conversión y errores de sintaxis
     test_thompson.py  # Construcción y aceptación de lenguajes
     test_subconjuntos.py # Conversión y equivalencia entre AFN y AFD
+    test_hopcroft.py  # Equivalencia y minimalidad del AFD resultante
     test_simulacion.py # Recorridos sobre autómatas definidos a mano
 ```
 
@@ -130,8 +158,8 @@ Consulta el [plan de commits](docs/plan.md), la
 
 ## Entrega final
 
-Queda pendiente implementar Hopcroft, los dibujos y la interfaz con lectura de
-archivos, además de completar la documentación y
-agregar el enlace al video explicativo no listado de YouTube, de un máximo de
+Queda pendiente implementar los dibujos y la interfaz con lectura de archivos,
+además de completar la documentación y agregar el enlace al video explicativo
+no listado de YouTube, de un máximo de
 10 minutos. El enunciado solicita entregar el proyecto en un repositorio privado
 de GitHub o Bitbucket.
