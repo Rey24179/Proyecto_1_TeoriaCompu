@@ -18,7 +18,7 @@ La documentación se actualizará junto con el código de cada parte.
 
 ## Requisitos del enunciado
 
-- [ ] Convertir de infix a postfix usando Shunting Yard.
+- [x] Convertir de infix a postfix usando Shunting Yard.
 - [ ] Construir un AFN mediante Thompson.
 - [ ] Construir un AFD mediante subconjuntos.
 - [ ] Minimizar un AFD con Hopcroft.
@@ -53,3 +53,19 @@ git commit -m "feat: agregar estructura inicial y modelos de automatas"
 Antes de agregar los archivos, `git diff --stat` no muestra los archivos nuevos
 sin seguimiento; estos sí aparecen en `git status --short`. Después de
 `git add`, `git diff --cached --stat` muestra lo que entrará en el commit.
+
+## Parte 2: cómo revisar y guardar
+
+Incluye el conversor, sus pruebas y la documentación actualizada. Esta entrega
+todavía no implementa Thompson ni la interfaz de consola completa.
+
+```powershell
+python -m unittest discover -s tests -v
+python -c "from automatas import infix_a_postfix; print(infix_a_postfix('(a|b)*abb'))"
+git status --short
+git add automatas/regex.py automatas/__init__.py tests/test_regex.py README.md docs
+git diff --cached --stat
+git commit -m "feat: convertir expresiones infix a postfix"
+```
+
+La conversión del ejemplo debe imprimir `ab|*a.b.b.`.

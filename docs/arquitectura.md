@@ -64,9 +64,30 @@ Los tipos de datos indicados son parte del contrato entre módulos; estas
 validaciones comprueban la coherencia del autómata, no sustituyen un verificador
 de tipos de Python.
 
-## Módulos previstos para las siguientes partes
+## Conversión de expresiones: parte 2
 
-Esta tabla es el diseño propuesto; por ahora solo existe `modelos.py`.
+El módulo `automatas.regex` implementa estas funciones, también exportadas
+desde `automatas`:
+
+| Función | Entrada | Salida |
+| --- | --- | --- |
+| `insertar_concatenacion(expresion: str) -> str` | Expresión infix | Infix validada, sin espacios y con concatenación explícita |
+| `infix_a_postfix(expresion: str) -> str` | Expresión infix | Expresión postfix validada |
+
+`infix_a_postfix` llama a `insertar_concatenacion` y después aplica Shunting Yard.
+Ambas funciones producen `ValueError` ante una expresión inválida. Las posiciones
+indicadas en los errores se cuentan desde 1 sobre la entrada original, incluidos
+sus espacios. El error de expresión vacía o de operando faltante al final se
+describe sin una posición concreta.
+
+El resultado es una cadena, sin espacios ni paréntesis: cada carácter representa
+un literal, `ε` o un operador. La parte 3 consumirá esta representación desde
+Thompson. La explicación y una traza están en [Shunting Yard](shunting_yard.md).
+
+## Módulos del proyecto y previstos
+
+Actualmente existen `modelos.py` y `regex.py`. Los demás módulos de esta tabla
+forman parte del diseño de las siguientes entregas.
 
 | Módulo | Responsabilidad | Entrada y salida previstas |
 | --- | --- | --- |

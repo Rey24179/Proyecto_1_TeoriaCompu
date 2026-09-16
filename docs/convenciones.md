@@ -1,8 +1,8 @@
 # Convenciones del proyecto
 
 El enunciado exige elegir explícitamente un símbolo para épsilon. Usaremos `ε`.
-Las siguientes decisiones definen la sintaxis que implementaremos a partir de
-la parte 2; no son requisitos adicionales del enunciado.
+Las siguientes decisiones definen la sintaxis implementada en la parte 2;
+no son requisitos adicionales del enunciado.
 
 ## Expresiones regulares
 
@@ -18,17 +18,26 @@ la parte 2; no son requisitos adicionales del enunciado.
 | `(` y `)` | Agrupación | `(a\|b)*` |
 
 - Cada literal representa un carácter. Por ejemplo, `abc` son tres literales.
-- La precedencia será: operadores unarios (`*`, `+`, `?`), concatenación (`.`)
+- La precedencia es: operadores unarios (`*`, `+`, `?`), concatenación (`.`)
   y unión (`|`), de mayor a menor. Los paréntesis cambian la agrupación.
-- Los operadores binarios se asociarán por la izquierda.
-- El conversor insertará `.` donde exista concatenación implícita.
-- Se ignorarán los espacios en blanco de las expresiones regulares. En las
+- Los operadores binarios se asocian por la izquierda.
+- Los unarios son posfijos y pueden encadenarse: `a*?` equivale a `(a*)?`.
+  No se interpretan como cuantificadores perezosos de otras bibliotecas de regex.
+- El conversor inserta `.` donde existe concatenación implícita.
+- Se ignoran los espacios en blanco de las expresiones regulares. En las
   cadenas a simular, los caracteres se conservarán exactamente.
 - Para expresar la cadena vacía se escribirá `ε`; una expresión vacía se
-  considerará un error. Las líneas vacías de archivos se omitirán.
-- La sintaxis inicial no incluirá escapes, clases como `[a-z]`, comodines ni
-  repeticiones como `{2,3}`. Esas formas se reportarán como no soportadas.
-- Los operadores y `ε` son símbolos reservados y no podrán usarse como literales.
+  considera un error. Las líneas vacías de archivos se omitirán.
+- No se admiten escapes, clases como `[a-z]`, repeticiones como `{2,3}` ni
+  anclas `^` o `$`. Los caracteres `\`, `[`, `]`, `{`, `}`, `^` y `$` producen
+  un error de símbolo no soportado. Tampoco se admiten caracteres no imprimibles,
+  salvo los espacios en blanco que se ignoran.
+- No hay comodines: `.` siempre significa concatenación.
+- Los demás caracteres imprimibles, incluidos dígitos, `ñ`, `_`, `-` y `,`,
+  se consideran literales de un carácter.
+- Los operadores y `ε` son símbolos reservados y no pueden usarse como literales.
+- Los grupos vacíos `()` son inválidos; se debe escribir `(ε)` si se desea
+  agrupar la cadena vacía.
 
 ## Autómatas y cadenas
 
