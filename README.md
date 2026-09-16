@@ -3,12 +3,13 @@
 Implementación en Python de conversiones entre expresiones regulares y autómatas
 finitos, para el curso CC2019 de la Universidad del Valle de Guatemala.
 
-## Estado actual: parte 3
+## Estado actual: parte 4
 
 El proyecto convierte expresiones regulares de infix a postfix con Shunting Yard,
-construye su AFN con Thompson y simula cadenas sobre ese AFN. El conversor valida
-la sintaxis y la simulación considera las transiciones epsilon. La conversión
-a AFD, su simulación y su minimización se agregarán en las siguientes partes.
+construye su AFN con Thompson y lo convierte a AFD mediante subconjuntos. Es
+posible simular la misma cadena sobre ambos autómatas. El conversor valida la
+sintaxis y considera las transiciones epsilon. La minimización con Hopcroft
+se agregará en la siguiente parte.
 
 ## Requisitos
 
@@ -69,6 +70,32 @@ La salida esperada es `abb: True` y `aba: False` en líneas separadas.
 Si ya tienes postfix, usa `postfix_a_afn("ab|*a.b.b.")`. Consulta la
 [explicación de Thompson y la simulación](docs/thompson.md).
 
+## Convertir a AFD y comparar la aceptación
+
+```python
+from automatas import afn_a_afd, regex_a_afn, simular_afd, simular_afn
+
+afn = regex_a_afn("(a|b)*abb")
+afd = afn_a_afd(afn)
+
+for cadena in ("", "abb", "aabb", "aba"):
+    print(repr(cadena), simular_afn(afn, cadena), simular_afd(afd, cadena))
+```
+
+Salida esperada:
+
+```text
+'' False False
+'abb' True True
+'aabb' True True
+'aba' False False
+```
+
+Cada estado del AFD representa un conjunto de estados del AFN. El AFD generado
+es completo sobre su alfabeto e incluye un estado sumidero cuando se necesita.
+El AFN original se conserva. La construcción no minimiza el AFD; ese será el
+siguiente paso. Consulta la [explicación de subconjuntos](docs/subconjuntos.md).
+
 ## Estructura actual
 
 ```text
@@ -77,17 +104,20 @@ automatas/
     modelos.py        # Representación y validación de AFN y AFD
     regex.py          # Validación, concatenación y Shunting Yard
     thompson.py       # Construcción de AFN desde postfix o infix
-    simulacion.py     # Cierre epsilon, movimientos y simulación del AFN
+    subconjuntos.py   # Conversión de AFN a AFD
+    simulacion.py     # Cierre epsilon, movimientos y simulación de AFN y AFD
 docs/
     arquitectura.md  # Objetos y comunicación entre módulos
     convenciones.md  # Símbolos y sintaxis aceptada
     plan.md          # Entregas separadas por commits
     shunting_yard.md  # Explicación del conversor con ejemplo paso a paso
     thompson.md       # Reglas de construcción y ejemplo de simulación
+    subconjuntos.md   # Conversión a AFD con tabla de estados
 tests/
     test_modelos.py   # Pruebas de las estructuras de datos
     test_regex.py     # Pruebas de conversión y errores de sintaxis
     test_thompson.py  # Construcción y aceptación de lenguajes
+    test_subconjuntos.py # Conversión y equivalencia entre AFN y AFD
     test_simulacion.py # Recorridos sobre autómatas definidos a mano
 ```
 
@@ -100,8 +130,8 @@ Consulta el [plan de commits](docs/plan.md), la
 
 ## Entrega final
 
-Queda pendiente implementar subconjuntos, simulación de AFD, Hopcroft, los dibujos
-y la interfaz con lectura de archivos, además de completar la documentación y
+Queda pendiente implementar Hopcroft, los dibujos y la interfaz con lectura de
+archivos, además de completar la documentación y
 agregar el enlace al video explicativo no listado de YouTube, de un máximo de
 10 minutos. El enunciado solicita entregar el proyecto en un repositorio privado
 de GitHub o Bitbucket.

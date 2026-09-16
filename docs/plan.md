@@ -20,10 +20,10 @@ La documentación se actualizará junto con el código de cada parte.
 
 - [x] Convertir de infix a postfix usando Shunting Yard.
 - [x] Construir un AFN mediante Thompson.
-- [ ] Construir un AFD mediante subconjuntos.
+- [x] Construir un AFD mediante subconjuntos.
 - [ ] Minimizar un AFD con Hopcroft.
-- [ ] Simular la cadena sobre cada AFN y AFD producido e informar aceptación
-  (AFN implementado; AFD pendiente).
+- [x] Simular la cadena sobre cada AFN y AFD producido e informar aceptación
+  (funciones disponibles; integración en consola en la parte 7).
 - [ ] Dibujar un AFN o AFD dado.
 - [ ] Procesar un archivo UTF-8 con una expresión regular por línea y producir
   los resultados requeridos para cada expresión.
@@ -83,6 +83,22 @@ git status --short
 git add automatas/thompson.py automatas/simulacion.py automatas/__init__.py tests/test_thompson.py tests/test_simulacion.py README.md docs
 git diff --cached --stat
 git commit -m "feat: construir y simular AFN con Thompson"
+```
+
+El ejemplo debe imprimir `abb: True` y `aba: False` en líneas separadas.
+
+## Parte 4: cómo revisar y guardar
+
+Incluye construcción de subconjuntos, simulación del AFD y comparaciones de
+aceptación con el AFN. Hopcroft se reserva para la parte 5.
+
+```powershell
+python -m unittest discover -s tests -v
+python -c "from automatas import regex_a_afn, afn_a_afd, simular_afd; afd = afn_a_afd(regex_a_afn('(a|b)*abb')); print('abb:', simular_afd(afd, 'abb')); print('aba:', simular_afd(afd, 'aba'))"
+git status --short
+git add automatas tests README.md docs
+git diff --cached --stat
+git commit -m "feat: convertir AFN a AFD mediante subconjuntos"
 ```
 
 El ejemplo debe imprimir `abb: True` y `aba: False` en líneas separadas.

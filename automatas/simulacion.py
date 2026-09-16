@@ -1,6 +1,6 @@
 """Operaciones sobre conjuntos de estados y simulación de autómatas finitos."""
 
-from .modelos import AFN, EPSILON
+from .modelos import AFD, AFN, EPSILON
 
 
 def cierre_epsilon(afn: AFN, estados: set[int] | frozenset[int]) -> set[int]:
@@ -57,3 +57,23 @@ def simular_afn(afn: AFN, cadena: str) -> bool:
             return False
 
     return bool(actuales & afn.estados_aceptacion)
+
+
+def simular_afd(afd: AFD, cadena: str) -> bool:
+    """Indica si el AFD acepta la cadena completa, sin modificarlo.
+
+    Valida el AFD antes de simular. Un símbolo ajeno al alfabeto o una transición
+    ausente produce rechazo; también admite los AFD con tablas parciales.
+    """
+    afd.validar()
+    actual = afd.estado_inicial
+
+    for simbolo in cadena:
+        if simbolo not in afd.alfabeto:
+            return False
+        destino = afd.transiciones.get((actual, simbolo))
+        if destino is None:
+            return False
+        actual = destino
+
+    return actual in afd.estados_aceptacion

@@ -57,6 +57,12 @@ no son requisitos adicionales del enunciado.
   toda la cadena, ese conjunto contiene algún estado de aceptación.
 - Un símbolo de entrada fuera del alfabeto produce rechazo (`False`). Esto
   incluye el carácter `ε`: para simular la cadena vacía se utiliza `""`.
-- Un AFD podrá almacenarse de forma parcial; antes de aplicar Hopcroft se
-  completará, cuando haga falta, con un estado sumidero.
+- La simulación de AFD mantiene un único estado actual. Acepta si, después de
+  consumir toda la cadena, ese estado es final. La cadena vacía se acepta
+  únicamente cuando el estado inicial es final.
+- El modelo AFD admite tablas parciales y su simulador rechaza si falta una
+  transición. La conversión por subconjuntos genera un AFD completo: crea el
+  sumidero que representa el conjunto vacío solo si es alcanzable.
+- Antes de aplicar Hopcroft a un AFD parcial se completará su tabla, cuando haga
+  falta, con un estado sumidero.
 - Los archivos de texto se leerán en UTF-8 para conservar `ε` correctamente.

@@ -1,9 +1,9 @@
-"""Cierre epsilon, movimientos y simulación sobre AFN definidos a mano."""
+"""Operaciones y simulación sobre AFN y AFD definidos a mano."""
 
 from copy import deepcopy
 import unittest
 
-from automatas import AFN, EPSILON, cierre_epsilon, mover, simular_afn
+from automatas import AFD, AFN, EPSILON, cierre_epsilon, mover, simular_afd, simular_afn
 
 
 class TestOperacionesAFN(unittest.TestCase):
@@ -115,6 +115,62 @@ class TestSimulacionAFN(unittest.TestCase):
             {(estado, EPSILON): {estado + 1} for estado in range(2000)},
         )
         self.assertTrue(simular_afn(afn, ""))
+
+
+class TestSimulacionAFD(unittest.TestCase):
+    def test_sigue_un_unico_estado_y_consume_toda_la_cadena(self):
+        afd = AFD({10, 20, 30}, {"a", "b"}, 10, {30}, {(10, "a"): 20, (20, "b"): 30})
+        self.assertTrue(simular_afd(afd, "ab"))
+        for cadena in ("", "a", "b", "ba", "aba", "abc"):
+            with self.subTest(cadena=cadena):
+                self.assertFalse(simular_afd(afd, cadena))
+
+    def test_rechaza_transicion_ausente_en_una_tabla_parcial(self):
+        afd = AFD({0, 1}, {"a", "b"}, 0, {1}, {(0, "a"): 1})
+        self.assertFalse(simular_afd(afd, "b"))
+        self.assertFalse(simular_afd(afd, "aa"))
+
+    def test_cadena_vacia_depende_del_estado_inicial(self):
+        for finales, esperado in (({0}, True), ({1}, False), (set(), False)):
+            with self.subTest(finales=finales):
+                afd = AFD({0, 1}, set(), 0, finales)
+                self.assertEqual(simular_afd(afd, ""), esperado)
+
+    def test_cero_es_un_destino_valido(self):
+        afd = AFD({-5, 0}, {"a"}, -5, {0}, {(-5, "a"): 0, (0, "a"): 0})
+        self.assertTrue(simular_afd(afd, "a"))
+        self.assertTrue(simular_afd(afd, "a" * 2000))
+
+    def test_rechaza_epsilon_como_caracter_y_simbolos_ajenos(self):
+        afd = AFD({0}, {"a"}, 0, {0}, {(0, "a"): 0})
+        for cadena in (EPSILON, "b", "aε", " a"):
+            with self.subTest(cadena=cadena):
+                self.assertFalse(simular_afd(afd, cadena))
+
+    def test_admite_varios_estados_finales(self):
+        afd = AFD({0, 1}, {"a"}, 0, {0, 1}, {(0, "a"): 1, (1, "a"): 0})
+        for cadena in ("", "a", "aa", "aaa"):
+            with self.subTest(cadena=cadena):
+                self.assertTrue(simular_afd(afd, cadena))
+
+    def test_conserva_los_espacios_de_la_cadena(self):
+        afd = AFD({0, 1}, {" "}, 0, {1}, {(0, " "): 1})
+        self.assertTrue(simular_afd(afd, " "))
+        self.assertFalse(simular_afd(afd, ""))
+        self.assertFalse(simular_afd(afd, "  "))
+
+    def test_simulacion_no_modifica_el_afd(self):
+        afd = AFD({0, 1}, {"a"}, 0, {1}, {(0, "a"): 1})
+        copia = deepcopy(afd)
+        for cadena in ("", "a", "aa", "b"):
+            simular_afd(afd, cadena)
+        self.assertEqual(afd, copia)
+
+    def test_valida_el_afd_antes_de_simular(self):
+        afd = AFD({0}, {"a"}, 0, {0})
+        afd.transiciones[(0, "a")] = 99
+        with self.assertRaises(ValueError):
+            simular_afd(afd, "")
 
 
 if __name__ == "__main__":

@@ -117,11 +117,43 @@ el autómata para futuras cadenas y conversiones.
 
 Las reglas de construcción y una traza se describen en [Thompson](thompson.md).
 
+## Subconjuntos y simulación de AFD: parte 4
+
+Se agregan dos funciones, también exportadas desde `automatas`:
+
+| Función | Entrada | Salida |
+| --- | --- | --- |
+| `afn_a_afd(afn: AFN) -> AFD` | AFN válido | Nuevo AFD completo y equivalente |
+| `simular_afd(afd: AFD, cadena: str) -> bool` | AFD y cadena completa | `True` si acepta, `False` si rechaza |
+
+`afn_a_afd` valida el AFN y reutiliza `cierre_epsilon` y `mover`. La construcción
+mantiene un diccionario local `dict[frozenset[int], int]` que asigna un entero a
+cada subconjunto descubierto, y una cola `deque` con los subconjuntos pendientes.
+El cierre del estado inicial recibe el número `0`; los demás se numeran por
+orden de descubrimiento, recorriendo el alfabeto ordenado para obtener resultados
+reproducibles. El diccionario es interno: la función devuelve únicamente el AFD.
+
+Un estado del AFD es final si su subconjunto contiene algún final del AFN. Solo
+se generan subconjuntos alcanzables. Si se alcanza el conjunto vacío, se crea
+su estado sumidero, con transiciones hacia sí mismo para todo el alfabeto. La
+tabla resultante es total, incluso si el AFN tenía transiciones ausentes.
+Todos los conjuntos y diccionarios del AFD son independientes del AFN recibido.
+
+`simular_afd` valida el autómata y mantiene un único estado actual. Por cada
+carácter sigue la transición correspondiente; un símbolo ajeno al alfabeto o
+una transición ausente implica rechazo. También funciona con los AFD parciales
+que permite `modelos.py`. Al terminar acepta únicamente si el estado actual es
+final. No modifica el AFD ni elimina espacios de la cadena.
+
+Una entrada inconsistente produce `ValueError` al validar; una cadena que no
+pertenece al lenguaje devuelve `False`. El ejemplo de la construcción está en
+[Subconjuntos](subconjuntos.md).
+
 ## Módulos del proyecto y previstos
 
-Actualmente existen `modelos.py`, `regex.py`, `thompson.py` y la parte de AFN de
-`simulacion.py`. Los demás módulos y la simulación de AFD forman parte del diseño
-de las siguientes entregas.
+Actualmente existen `modelos.py`, `regex.py`, `thompson.py`, `subconjuntos.py` y
+`simulacion.py` para ambos tipos de autómata. Los demás módulos forman parte del
+diseño de las siguientes entregas.
 
 | Módulo | Responsabilidad | Entrada y salida previstas |
 | --- | --- | --- |
@@ -130,7 +162,7 @@ de las siguientes entregas.
 | `thompson.py` | Construir un AFN con fragmentos | `str` postfix o infix → `AFN` |
 | `subconjuntos.py` | Aplicar cierre epsilon y conjuntos de estados | `AFN` → `AFD` |
 | `hopcroft.py` | Eliminar estados inaccesibles, completar y minimizar | `AFD` → `AFD` |
-| `simulacion.py` | Evaluar la pertenencia de una cadena | `AFN`, `str` → `bool`; AFD pendiente |
+| `simulacion.py` | Evaluar la pertenencia de una cadena | `AFN` o `AFD`, `str` → `bool` |
 | `visualizacion.py` | Dibujar estados y transiciones | `AFN` o `AFD`, ruta → archivo |
 | `archivos.py` | Leer expresiones e informar errores por línea | Ruta UTF-8 → expresiones con número de línea |
 | `main.py` (en la raíz) | Coordinar las opciones del usuario | Argumentos de consola → resultados |
