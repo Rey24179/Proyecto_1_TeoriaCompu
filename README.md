@@ -196,7 +196,6 @@ ejemplos/
 docs/
     arquitectura.md  # Objetos y comunicación entre módulos
     convenciones.md  # Símbolos y sintaxis aceptada
-    plan.md          # Entregas separadas por commits
     shunting_yard.md  # Explicación del conversor con ejemplo paso a paso
     thompson.md       # Reglas de construcción y ejemplo de simulación
     subconjuntos.md   # Conversión a AFD con tabla de estados
@@ -221,8 +220,8 @@ La cadena vacía se representa con `ε` en las expresiones regulares y las
 transiciones. Una cadena de entrada vacía se representa con `""` en Python.
 El símbolo `ε` no pertenece al alfabeto de entrada ni se consume al simular.
 
-Consulta el [plan de commits](docs/plan.md), la
-[arquitectura](docs/arquitectura.md) y las [convenciones](docs/convenciones.md).
+Consulta la [arquitectura](docs/arquitectura.md) y las
+[convenciones](docs/convenciones.md).
 
 ## Entrega final
 
