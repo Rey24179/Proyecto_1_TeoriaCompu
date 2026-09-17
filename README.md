@@ -230,4 +230,4 @@ académica todavía debes grabar el video explicativo no listado de YouTube,
 de un máximo de 10 minutos, agregar su enlace a este README y verificar que el
 repositorio de GitHub o Bitbucket sea privado.
 
-**Enlace al video:** pendiente de grabación y publicación por el estudiante.
+**Enlace al video:** (https://youtu.be/zEXoY0udQjY?si=Po6kCHCOfB5XoQ93)
