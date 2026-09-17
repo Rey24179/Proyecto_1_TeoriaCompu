@@ -225,9 +225,6 @@ Consulta la [arquitectura](docs/arquitectura.md) y las
 
 ## Entrega final
 
-El código y la documentación técnica están implementados. Para la entrega
-académica todavía debes grabar el video explicativo no listado de YouTube,
-de un máximo de 10 minutos, agregar su enlace a este README y verificar que el
-repositorio de GitHub o Bitbucket sea privado.
+
 
 **Enlace al video:** (https://youtu.be/zEXoY0udQjY?si=Po6kCHCOfB5XoQ93)
